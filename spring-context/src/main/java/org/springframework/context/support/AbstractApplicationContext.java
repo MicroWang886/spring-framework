@@ -453,6 +453,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @return the ResourcePatternResolver for this context
 	 * @see #getResources
 	 * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver
+	 * 返回一个ResourcePatternResolver，它是用于根据路径解析成资源实例的。默认是 PathMatchingResourcePatternResolver（支持）
+	 * 通配符路径匹配，这个可以被子类重写用于扩展解决策略。在web环境中，当解析路径时不会使用这个解析器，而是调用getResources方法（会代理出
+	 * 一个ResourcePatternResolver）
+	 *
 	 */
 	protected ResourcePatternResolver getResourcePatternResolver() {
 		return new PathMatchingResourcePatternResolver(this);
@@ -470,6 +474,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * this (child) application context environment if the parent is non-{@code null} and
 	 * its environment is an instance of {@link ConfigurableEnvironment}.
 	 * @see ConfigurableEnvironment#merge(ConfigurableEnvironment)
+	 * 设置父容器
 	 */
 	@Override
 	public void setParent(@Nullable ApplicationContext parent) {
@@ -516,6 +521,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
 			// Prepare this context for refreshing.
+			//为容器刷新做准备，设置开始时间和激活标志位同时执行任意属性源的初始化
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
@@ -597,10 +603,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Initialize any placeholder property sources in the context environment.
+		//在上下文环境中初始化任意站位符属性源（这里是留给子类扩展的）
 		initPropertySources();
 
 		// Validate that all properties marked as required are resolvable:
 		// see ConfigurablePropertyResolver#setRequiredProperties
+		//验证所有被标记的必须的属性都是可解析的(这里用户可以自己定义环境必须的属性)
 		getEnvironment().validateRequiredProperties();
 
 		// Store pre-refresh ApplicationListeners...

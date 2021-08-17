@@ -72,6 +72,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	/**
 	 * Set the config locations for this application context.
 	 * <p>If not set, the implementation may use a default as appropriate.
+	 * 设置配置路径
 	 */
 	public void setConfigLocations(@Nullable String... locations) {
 		if (locations != null) {
@@ -119,6 +120,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	 * environment property values if necessary. Applied to config locations.
 	 * @param path the original file path
 	 * @return the resolved file path
+	 * 根据给定路径解析，如有必要根据指定的环境参数值替换占位符并设置在配置路径中
 	 * @see org.springframework.core.env.Environment#resolveRequiredPlaceholders(String)
 	 */
 	protected String resolvePath(String path) {
