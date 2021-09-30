@@ -608,7 +608,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	@SuppressWarnings("unchecked")
 	public <T> Map<String, T> getBeansOfType(
 			@Nullable Class<T> type, boolean includeNonSingletons, boolean allowEagerInit) throws BeansException {
-
+		//根据类型查找所有满足条件的bean的名称
 		String[] beanNames = getBeanNamesForType(type, includeNonSingletons, allowEagerInit);
 		Map<String, T> result = new LinkedHashMap<>(beanNames.length);
 		for (String beanName : beanNames) {
@@ -1125,11 +1125,13 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			ResolvableType requiredType, @Nullable Object[] args, boolean nonUniqueAsNull) throws BeansException {
 
 		Assert.notNull(requiredType, "Required type must not be null");
+		//根据类型获取所有满足条件的Bean的name;
 		String[] candidateNames = getBeanNamesForType(requiredType);
-
+		//如果有多个bean满足条件
 		if (candidateNames.length > 1) {
 			List<String> autowireCandidates = new ArrayList<>(candidateNames.length);
 			for (String beanName : candidateNames) {
+				//当前bean没有BeanDefinition或者拥有BeanDefinition且允许被其它bean依赖那么就会放在这个list里面
 				if (!containsBeanDefinition(beanName) || getBeanDefinition(beanName).isAutowireCandidate()) {
 					autowireCandidates.add(beanName);
 				}
@@ -1138,7 +1140,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				candidateNames = StringUtils.toStringArray(autowireCandidates);
 			}
 		}
-
+		//如果只有一个满足条件，那么直接返回
 		if (candidateNames.length == 1) {
 			String beanName = candidateNames[0];
 			return new NamedBeanHolder<>(beanName, (T) getBean(beanName, requiredType.toClass(), args));
@@ -1154,8 +1156,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					candidates.put(beanName, getType(beanName));
 				}
 			}
+			//尝试查找标有@Primary注解的Bean
 			String candidateName = determinePrimaryCandidate(candidates, requiredType.toClass());
 			if (candidateName == null) {
+				//尝试查找最高优先级别的bean
 				candidateName = determineHighestPriorityCandidate(candidates, requiredType.toClass());
 			}
 			if (candidateName != null) {
